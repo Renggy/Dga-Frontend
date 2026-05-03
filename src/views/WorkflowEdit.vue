@@ -99,6 +99,7 @@
         :is-loading-logs="isLoadingLogs"
         :step-logs-list="stepLogsList"
         :has-more-logs="hasMoreLogs"
+        :analyzing-log-id="analyzingLogId"
         @close="selectedNodeId = null"
         @fetchLogs="fetchStepLogs"
         @fetchContext="fetchWorkflowContext"
@@ -107,6 +108,7 @@
         @addRule="addRule"
         @removeRule="removeRule"
         @delete="deleteNode"
+        @analyzeLog="analyzeLog"
       />
     </div>
 
@@ -172,6 +174,7 @@ const stepLogsList  = ref<any[]>([]);
 const currentLogsPage = ref(1);
 const hasMoreLogs   = ref(false);
 const isLoadingLogs = ref(false);
+const analyzingLogId = ref<string | null>(null);
 
 // --- Misc ---
 const lastFocusedInput = ref<HTMLInputElement | HTMLTextAreaElement | null>(null);
@@ -595,6 +598,30 @@ const runIndividualStep = async (stepKey: string) => {
   } catch (error: any) {
     if (node) node.data.status = 'error';
     showToast('Failed', `Step ${stepKey} failed: ${error.response?.data?.message || error.message}`, 'error');
+  }
+};
+
+const analyzeLog = async (log: any) => {
+  if (!log.id || !log.workflow_run_id) return;
+  
+  analyzingLogId.value = log.id;
+  try {
+    const res: any = await ApiService.post(
+      `/workflows/${route.params.id}/runs/${log.workflow_run_id}/steps/${log.id}/analyze`
+    );
+    // Update the log object in the list with the analysis result
+    const index = stepLogsList.value.findIndex(l => l.id === log.id);
+    if (index !== -1) {
+      stepLogsList.value[index] = {
+        ...stepLogsList.value[index],
+        ai_analysis: res.data
+      };
+    }
+    showToast('AI Analysis Ready', 'Diagnosis and solution have been generated.', 'success');
+  } catch (error: any) {
+    showToast('AI Error', 'Failed to analyze failure with AI', 'error');
+  } finally {
+    analyzingLogId.value = null;
   }
 };
 

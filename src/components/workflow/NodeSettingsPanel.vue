@@ -186,6 +186,35 @@
                     <pre class="bg-black/40 p-2 rounded border border-white/5 overflow-x-auto text-emerald-300 max-h-32">{{ JSON.stringify(log.output, null, 2) }}</pre>
                   </div>
                   <div v-if="log.error_message" class="mt-2 text-rose-300 whitespace-pre-wrap">{{ log.error_message }}</div>
+
+                  <!-- AI Analysis Trigger & Result -->
+                  <div v-if="log.status === 'failed' || log.status === 'error'" class="mt-4 pt-4 border-t border-white/5">
+                    <button 
+                      v-if="!log.ai_analysis"
+                      @click="$emit('analyzeLog', log)" 
+                      :disabled="analyzingLogId === log.id"
+                      class="px-3 py-1.5 rounded-lg bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 text-[9px] font-bold border border-purple-500/20 transition-all flex items-center gap-2"
+                    >
+                      <svg v-if="analyzingLogId === log.id" class="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                      <span v-else>✨</span>
+                      {{ analyzingLogId === log.id ? 'Consulting AI...' : 'Analyze Failure with AI' }}
+                    </button>
+
+                    <div v-if="log.ai_analysis" class="p-4 rounded-xl bg-purple-500/5 border border-purple-500/20 space-y-3 relative overflow-hidden group">
+                      <div class="absolute top-0 right-0 p-2 opacity-20">
+                        <span class="text-xl">✨</span>
+                      </div>
+                      <div class="space-y-1">
+                        <span class="text-[8px] font-black text-purple-400 uppercase tracking-[0.2em]">AI Diagnosis</span>
+                        <p class="text-[10px] text-white/90 leading-relaxed font-medium">{{ log.ai_analysis.diagnosis }}</p>
+                      </div>
+                      <div class="h-px bg-purple-500/10"></div>
+                      <div class="space-y-1">
+                        <span class="text-[8px] font-black text-emerald-400 uppercase tracking-[0.2em]">Suggested Solution</span>
+                        <p class="text-[10px] text-emerald-50/70 leading-relaxed italic">{{ log.ai_analysis.solution }}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
              </div>
              <button v-if="hasMoreLogs" @click="$emit('fetchLogs', true)" :disabled="isLoadingLogs" class="w-full py-2 rounded-lg bg-white/5 text-[10px] font-bold text-white/50 border border-white/5">
@@ -217,9 +246,10 @@ const props = defineProps<{
   isLoadingLogs: boolean;
   stepLogsList: any[];
   hasMoreLogs: boolean;
+  analyzingLogId: string | null;
 }>();
 
 const activeTab = ref('settings');
 
-defineEmits(['close', 'fetchLogs', 'fetchContext', 'insertVariable', 'trackFocus', 'addRule', 'removeRule', 'delete']);
+defineEmits(['close', 'fetchLogs', 'fetchContext', 'insertVariable', 'trackFocus', 'addRule', 'removeRule', 'delete', 'analyzeLog']);
 </script>

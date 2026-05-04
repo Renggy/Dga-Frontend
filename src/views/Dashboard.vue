@@ -15,12 +15,12 @@
             </span>
           </div>
           <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 transition-colors duration-300">
-              <span class="w-2 h-2 rounded-full relative">
+            <div class="flex items-center gap-2.5 pl-2.5 pr-4 py-1.5 rounded-full bg-white/5 border border-white/10 transition-colors duration-300">
+              <div class="flex items-center justify-center w-2 h-2 relative">
                 <span class="absolute inline-flex h-full w-full rounded-full opacity-75" :class="isConnected ? 'animate-ping bg-emerald-400' : 'bg-rose-400'"></span>
                 <span class="relative inline-flex rounded-full w-2 h-2" :class="isConnected ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]' : 'bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.5)]'"></span>
-              </span>
-              <span class="text-xs font-medium text-white/70">{{ isConnected ? 'Connected' : 'Disconnected' }}</span>
+              </div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-white/60 leading-none">{{ isConnected ? 'Connected' : 'Disconnected' }}</span>
             </div>
             
             <div class="h-8 w-[1px] bg-white/10 mx-2"></div>
@@ -146,7 +146,7 @@
                       <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd" />
                     </svg>
                   </button>
-                  <router-link v-if="authStore.user && authStore.user.role.slug !== 'VIEWER'" :to="`/workflows/${workflow.id}/edit`" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 transition-colors" title="Edit Workflow">
+                  <router-link v-if="authStore.user" :to="`/workflows/${workflow.id}/edit`" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 transition-colors" :title="authStore.user.role.slug === 'VIEWER' ? 'View Workflow' : 'Edit Workflow'">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                     </svg>
@@ -260,6 +260,11 @@ const events = ref<any[]>([]);
 const showCreateModal = ref(false);
 const isCreating = ref(false);
 const newWorkflow = ref({ name: '', description: '' });
+
+const logout = () => {
+  authStore.logout();
+  router.push('/login');
+};
 
 // Mapping workflow_id -> run_id untuk state tombol Play/Stop
 const activeRuns = ref<Record<string, string>>({});

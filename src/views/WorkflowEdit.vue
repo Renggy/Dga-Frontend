@@ -58,7 +58,7 @@
       <SidebarComponents v-if="!isViewer" @dragstart="onDragStart" />
 
       <!-- Vue Flow Canvas -->
-      <div class="flex-1 relative" @drop="isViewer ? null : onDrop" @dragover.prevent @dragenter.prevent>
+      <div class="flex-1 relative" @drop="onDrop" @dragover.prevent @dragenter.prevent>
         <VueFlow 
           v-model="elements" 
           :default-zoom="1.5" :min-zoom="0.2" :max-zoom="4" 
@@ -68,7 +68,7 @@
           :elements-selectable="true"
           @nodeClick="onNodeClick" 
           @edgeClick="onEdgeClick" 
-          @connect="isViewer ? null : onConnect" 
+          @connect="onConnect" 
           fit-view-on-init class="flowforge-theme" edge-type="smoothstep"
         >
           <Background pattern-color="#ffffff" :gap="20" :size="1" :opacity="0.05" />
@@ -222,6 +222,9 @@ let currentRunChannel: any    = null;
 
 // Initialization
 onMounted(() => {
+  if (!authStore.user) {
+    authStore.fetchMe();
+  }
   initWebSocket();
   fetchWorkflowData();
 });
@@ -314,6 +317,7 @@ const convertDagToVueFlow = (steps: any[]) => {
  * Menentukan label & warna edge secara otomatis berdasarkan tipe node sumber.
  */
 const onConnect = (params: any) => {
+  if (isViewer.value) return;
   const sourceNode = elements.value.find(el => el.id === params.source);
   let label = '';
   let style = { stroke: '#8b5cf6', strokeWidth: 2 };
@@ -360,6 +364,7 @@ const onConnect = (params: any) => {
  * Membuat node baru dengan payload default sesuai tipe komponen.
  */
 const onDrop = (event: DragEvent) => {
+  if (isViewer.value) return;
   const type = event.dataTransfer?.getData('application/vueflow');
   if (!type) return;
 

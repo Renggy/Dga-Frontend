@@ -455,6 +455,9 @@ const addEvent = (type, title, message) => {
 };
 
 onMounted(() => {
+  if (!authStore.user) {
+    authStore.fetchMe();
+  }
   fetchWorkflows(); // Juga memanggil fetchStats di dalamnya
   initWebSocket();
 });

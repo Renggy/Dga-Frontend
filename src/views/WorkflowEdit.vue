@@ -22,29 +22,55 @@
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           History
         </router-link>
-        <button @click="saveWorkflow" :disabled="isSaving" class="px-4 py-2 bg-white/5 hover:bg-white/10 text-white text-xs font-bold rounded-lg transition-all border border-white/10 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+        <button v-if="!isViewer" @click="saveWorkflow" :disabled="isSaving" class="px-4 py-2 bg-white/5 hover:bg-white/10 text-white text-xs font-bold rounded-lg transition-all border border-white/10 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
           <svg v-if="isSaving" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
           <svg v-else class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
           {{ isSaving ? 'Saving...' : 'Save Layout' }}
         </button>
-        <button v-if="!isExecuting" @click="triggerWorkflow" :disabled="isSaving" class="px-6 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white text-xs rounded-lg font-bold transition-all shadow-lg shadow-emerald-500/20 flex items-center gap-2">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
-          Run Workflow
-        </button>
-        <button v-else @click="stopWorkflow" class="px-6 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs rounded-lg font-bold transition-all shadow-lg shadow-rose-500/20 flex items-center gap-2 animate-pulse">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd" /></svg>
-          Stop Workflow
+        
+        <template v-if="!isViewer">
+          <button v-if="!isExecuting" @click="triggerWorkflow" :disabled="isSaving" class="px-6 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white text-xs rounded-lg font-bold transition-all shadow-lg shadow-emerald-500/20 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
+            Run Workflow
+          </button>
+          <button v-else @click="stopWorkflow" class="px-6 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs rounded-lg font-bold transition-all shadow-lg shadow-rose-500/20 flex items-center gap-2 animate-pulse">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd" /></svg>
+            Stop Workflow
+          </button>
+        </template>
+        
+        <div v-else class="px-4 py-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-lg text-[10px] font-bold uppercase tracking-widest">
+          Read Only Mode
+        </div>
+
+        <div class="h-8 w-[1px] bg-white/10 mx-1"></div>
+
+        <button @click="logout" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-all group" title="Logout">
+          <svg class="w-4 h-4 text-white/50 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
         </button>
       </div>
     </nav>
 
     <!-- Main Workspace -->
     <div class="flex-1 flex overflow-hidden relative">
-      <SidebarComponents @dragstart="onDragStart" />
+      <SidebarComponents v-if="!isViewer" @dragstart="onDragStart" />
 
       <!-- Vue Flow Canvas -->
       <div class="flex-1 relative" @drop="onDrop" @dragover.prevent @dragenter.prevent>
-        <VueFlow v-model="elements" :default-zoom="1.5" :min-zoom="0.2" :max-zoom="4" :edges-selectable="true" @nodeClick="onNodeClick" @edgeClick="onEdgeClick" @connect="onConnect" fit-view-on-init class="flowforge-theme" edge-type="smoothstep">
+        <VueFlow 
+          v-model="elements" 
+          :default-zoom="1.5" :min-zoom="0.2" :max-zoom="4" 
+          :edges-selectable="true" 
+          :nodes-draggable="!isViewer"
+          :nodes-connectable="!isViewer"
+          :elements-selectable="true"
+          @nodeClick="onNodeClick" 
+          @edgeClick="onEdgeClick" 
+          @connect="onConnect" 
+          fit-view-on-init class="flowforge-theme" edge-type="smoothstep"
+        >
           <Background pattern-color="#ffffff" :gap="20" :size="1" :opacity="0.05" />
           <Controls position="bottom-right" />
           
@@ -63,7 +89,7 @@
               
               <Handle :position="Position.Top" type="target" class="w-3 h-3 bg-white border-2 border-[#0A0A0B]" />
               
-              <button @click.stop="runIndividualStep(props.id)" class="absolute -top-3 -right-3 w-6 h-6 rounded-full bg-emerald-500 text-white shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:scale-110 z-50">
+              <button v-if="!isViewer" @click.stop="runIndividualStep(props.id)" class="absolute -top-3 -right-3 w-6 h-6 rounded-full bg-emerald-500 text-white shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all hover:scale-110 z-50">
                 <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
               </button>
 
@@ -100,6 +126,7 @@
         :step-logs-list="stepLogsList"
         :has-more-logs="hasMoreLogs"
         :analyzing-log-id="analyzingLogId"
+        :is-viewer="isViewer"
         @close="selectedNodeId = null"
         @fetchLogs="fetchStepLogs"
         @fetchContext="fetchWorkflowContext"
@@ -129,7 +156,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed, onUnmounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import { useAuthStore } from '../stores/auth';
 import ApiService from '../services/ApiService';
 import NodeIcon from '../components/workflow/NodeIcon.vue';
 import SidebarComponents from '../components/workflow/SidebarComponents.vue';
@@ -150,6 +178,15 @@ import Pusher from 'pusher-js';
 
 const { project } = useVueFlow();
 const route        = useRoute();
+const router       = useRouter();
+const authStore    = useAuthStore();
+
+const isViewer = computed(() => authStore.user?.role.slug === 'VIEWER');
+
+const logout = () => {
+  authStore.logout();
+  router.push('/login');
+};
 
 // --- UI State ---
 const isLoading    = ref(true);
@@ -185,6 +222,9 @@ let currentRunChannel: any    = null;
 
 // Initialization
 onMounted(() => {
+  if (!authStore.user) {
+    authStore.fetchMe();
+  }
   initWebSocket();
   fetchWorkflowData();
 });
@@ -277,6 +317,7 @@ const convertDagToVueFlow = (steps: any[]) => {
  * Menentukan label & warna edge secara otomatis berdasarkan tipe node sumber.
  */
 const onConnect = (params: any) => {
+  if (isViewer.value) return;
   const sourceNode = elements.value.find(el => el.id === params.source);
   let label = '';
   let style = { stroke: '#8b5cf6', strokeWidth: 2 };
@@ -323,6 +364,7 @@ const onConnect = (params: any) => {
  * Membuat node baru dengan payload default sesuai tipe komponen.
  */
 const onDrop = (event: DragEvent) => {
+  if (isViewer.value) return;
   const type = event.dataTransfer?.getData('application/vueflow');
   if (!type) return;
 

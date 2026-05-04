@@ -5,10 +5,14 @@
         <router-link to="/" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-colors">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
         </router-link>
-        <div>
+        <div class="flex-1">
           <h1 class="text-3xl font-extrabold tracking-tight">Execution History</h1>
           <p class="text-sm text-white/50">Viewing runs for Workflow ID: {{ route.params.id }}</p>
         </div>
+        <button @click="logout" class="px-4 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-xs font-bold transition-all flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+          Logout
+        </button>
       </div>
 
       <!-- Filters -->
@@ -81,10 +85,18 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import { useAuthStore } from '../stores/auth';
 import ApiService from '../services/ApiService';
 
 const route = useRoute();
+const router = useRouter();
+const authStore = useAuthStore();
+
+const logout = () => {
+  authStore.logout();
+  router.push('/login');
+};
 const runs = ref<any[]>([]);
 const isLoading = ref(true);
 const filter = ref('');

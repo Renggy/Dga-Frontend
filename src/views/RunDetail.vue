@@ -21,6 +21,12 @@
               }">
           {{ runData.status }}
         </span>
+        <div class="h-8 w-[1px] bg-white/10 mx-1"></div>
+        <button @click="logout" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-all group" title="Logout">
+          <svg class="w-4 h-4 text-white/50 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+        </button>
       </div>
     </header>
 
@@ -86,10 +92,18 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import { useAuthStore } from '../stores/auth';
 import ApiService from '../services/ApiService';
 
 const route = useRoute();
+const router = useRouter();
+const authStore = useAuthStore();
+
+const logout = () => {
+  authStore.logout();
+  router.push('/login');
+};
 const runData = ref<any>(null);
 const isLoading = ref(true);
 const selectedStep = ref<any>(null);

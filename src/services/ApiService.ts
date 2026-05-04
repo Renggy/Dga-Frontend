@@ -33,9 +33,11 @@ class ApiService {
       (response: AxiosResponse) => response.data,
       (error: any) => {
         if (error.response && error.response.status === 401) {
-          // Auto logout on 401 Unauthorized
+          // Auto logout on 401 Unauthorized, but don't redirect if we are already on the login page
           Cookies.remove('token');
-          window.location.href = '/login';
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
         }
         return Promise.reject(error.response?.data || error.message);
       }
